@@ -1,0 +1,53 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+        "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+<HEAD>
+    <title>jQuery.i18n.properties: Demo</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta http-equiv="content-script-type" content="text/javascript"/>
+
+    <!-- JS -->
+    <!--<script src="https://cdn.staticfile.org/jquery/1.10.2/jquery.min.js"></script>-->
+    <script type="text/javascript" src="js/jquery.js"></script>
+    <script type="text/javascript" src="js/jquery.i18n.properties.js"></script>
+    <script type="text/javascript" src="js/util.js"></script>
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/blueprint/screen.css" type="text/css" media="screen, projection">
+    <link rel="stylesheet" href="css/blueprint/print.css" type="text/css" media="print">
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="css/blueprint/ie.css" type="text/css" media="screen, projection"><![endif]-->
+    <link rel="stylesheet" href="css/style.css" type="text/css" media="screen, projection">
+
+</HEAD>
+
+<BODY>
+<select id='sel' onchange="resetToken(this.value)">
+    <option value='zh'>中文</option>
+    <option value='en'>english</option>
+</select>
+
+<button id='bt' type='button'
+        onclick='showMsg([{message: "检索失败"}, {message: "保存预警配置数据失败!"}, {message: "查询预警配置时传入的参数alertNo(预警编号)为空!"}])'></button>
+
+<form>
+    <div class="s_userinput_x">
+        <input id="username" name="username" type="text" placeholder="账号"/>
+    </div>
+    <div class="s_userinput_y">
+        <input id="password" name="password" type="password" placeholder="密码"/>
+    </div>
+</form>
+
+<script>
+    $(document).ready(function () {
+        if (localStorage.getItem('lang-token') != null) {
+            $('#sel').val(localStorage.getItem('lang-token'));
+            resetToken(localStorage.getItem('lang-token'));
+        } else {
+            resetToken('zh');
+        }
+    })
+</script>
+</BODY>
+</HTML>

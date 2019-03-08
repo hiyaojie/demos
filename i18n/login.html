@@ -1,0 +1,178 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8"
+pageEncoding="UTF-8"%>
+<%@include file="imes/base/jsp/inithome.jsp" %>
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+    <title>用户登入</title>
+    <!--<link href="<%=request.getContextPath() %>/imes/base/global/css/DTS_global.css" rel="stylesheet" type="text/css" />-->
+    <link href="<%=request.getContextPath() %>/imes/base/weblogincss/weblogin.css" rel="stylesheet" type="text/css"/>
+</head>
+<script type="text/javascript" src="./imes/base/js/web_login.js"></script>
+<script type="text/javascript" src="./imes/base/js/jquery.js"></script>
+<script type="text/javascript" src="js/jquery.i18n.properties.js"></script>
+<script type="text/javascript" src="js/util.js"></script>
+
+<script type="text/javascript">
+    var M = PORTAL.initialize.Message;
+    YAHOO.util.Event.onDOMReady(function () {
+        var error = "<%= request.getParameter("
+        error
+        ")%>";
+        var siteNo = "<%= request.getParameter("
+        siteNo
+        ")%>";
+        var siteValue = $("li:eq(1)").attr('value');
+        var siteId = $("li:eq(1)").html();
+        if (siteId == "*") {//如果第一个站点为*,则选择下一个站点
+            siteValue = $("li:eq(2)").attr('value');
+            siteId = $("li:eq(2)").html();
+        }
+        $("#siteValue").html(siteId);
+        $("#siteId").val(siteValue);
+        try {
+            if (error == "usernameNotFound") {
+                M.show("error", "对不起，此用户不存在！");
+            } else if (error == "disabled") {
+                M.show("error", "对不起，此用户已被禁用！");
+            } else if (error == "passwordError") {
+                M.show("error", "对不起，用户密码错误！");
+            } else if (error == "siteNotAllowed") {
+                M.show("error", "对不起，您无权访问SITE[" + siteNo + "]！");
+            } else if (error == "resetPassWord") {
+                M.show("error", "！");
+            }
+        } catch (ex) {
+            M.show("error", "初始化页面失败![ex:" + ex.message + "]");
+        }
+        getValue(obj);
+
+    });
+</script>
+<script type=text/javascript>
+    $(document).ready(function () {
+        $("#firstpane .menu_body:eq(0)").show();
+        $("#firstpane p.menu_head").click(function () {
+            $(this).addClass("current").next("div.menu_body").slideToggle(300).siblings("div.menu_body").slideUp("slow");
+            $(this).siblings().removeClass("current");
+        });
+        $("#secondpane .menu_body:eq(0)").show();
+        $("#secondpane p.menu_head").mouseover(function () {
+            $(this).addClass("current").next("div.menu_body").slideDown(500).siblings("div.menu_body").slideUp("slow");
+            $(this).siblings().removeClass("current");
+        });
+
+    });
+</script>
+
+<body id="s_login_body">
+
+<div class="s_login_center">
+    <div class="s_login_left">
+        <img alt="" src="${contextPath}/imes/base/images/web_login_left1.png">
+    </div>
+    <div style="float: right;width: 754px;position: relative;padding-top: 4%">
+        <div class="s_login_right">
+            <div style="float:right;margin-right:100px">
+            </div>
+
+            <div class="s_userinput_Logo">
+                <img class="s_login_pic" src="${contextPath}/imes/base/images/logo.png">
+            </div>
+            <div class="s_hs_msginp">
+                <form method="post" action="j_spring_security_check" onsubmit="return checkSite()">
+                    <div class="s_userinput_x">
+                        <span><img alt="" src="${contextPath}/imes/base/images/web_account.png" align="middle"> </span>
+                        <input id="username" name="username" type="text" placeholder="账号" vtype="notnull"
+                               OnChange='getUser(this.value)'/>
+                    </div>
+                    <div class="s_userinput_y">
+                        <span><img alt="" src="${contextPath}/imes/base/images/web_password.png" align="middle"> </span>
+                        <input id="password" name="password" type="password" placeholder="密码" vtype="notnull"/>
+                        <!-- <input id="password" name="password" type="password" value="" vtype="notnull" style="display: none;" onblur="change(this)"/> -->
+                    </div>
+                    <div class="s_sbut_x">
+                        <input name="" type="submit" style="font-color:#ffffff;" value="登  录"/>
+                    </div>
+
+                    <div><input id="loginMode" name="loginMode" type="hidden" value="default"/></div>
+                    <div class="selectAndScaning">
+                        <div class="s_site_select" onclick="divishidden()">
+                            <div style="padding-top: 14px">
+                                <span><img alt="" src="${contextPath}/imes/base/images/websiteselect.png">&nbsp;&nbsp;&nbsp;</span>
+                                <span>站点&nbsp;&nbsp;</span>
+                                <span id="siteValue">&nbsp;&nbsp;&nbsp;</span>
+                                <input type="hidden" name="siteId" id="siteId">
+                            </div>
+                        </div>
+                        <div class="scaning_login" onclick="scan_login()">
+                            <img alt="" src="${contextPath}/imes/base/images/webscaninglogo.png"
+                                 style="float: left;margin-top: 16px;margin-left:50px">
+                            <div style="margin-top: 13px;width: 160px;">扫码登录</div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div id="select_site_id" class="s_login_middle">
+            <div id="firstpane" class="menu_list">
+                <c:set value="${pfn:findLoginSite('siteService','')}" var="item"></c:set>
+                <c:if test="${!empty item.SiteData}">
+                    <c:forEach var="site" items="${item.SiteData}" varStatus="current">
+                        <c:if test="${current.index == 0}">
+                            <p class="menu_head">${site.key }</p>
+                        </c:if>
+                        <c:if test="${current.index != 0}">
+                            <p class="menu_head">${site.key }</p>
+                        </c:if>
+                        <div style="display:block" class="menu_body">
+                            <table style="order-collapse:collapse;border:0px solid ;margin-top:8px; margin-bottom:8px"
+                                   cellspacing="8">
+                                <c:forEach var="sitedata" items="${site.value}" varStatus="status">
+                                    <c:if test="${(status.index+1) % 3 == 1}">
+                                        <tr>
+                                    </c:if>
+                                    <td id="${sitedata.id }"
+                                        onmouseout="javascript:this.style.background='#ffffff';this.style.color='#666666'"
+                                        ;
+                                        onmousemove="javascript:this.style.background='#31baee';this.style.color='ffffff'"
+                                        ; onclick="getColumnDetail(this,this.id,this.value)" align="center">
+                                        ${sitedata.no }
+                                    </td>
+                                    <c:if test="${(status.index+1) % 3 == 0}">
+                                        </tr>
+                                    </c:if>
+
+                                </c:forEach>
+                            </table>
+                        </div>
+                    </c:forEach>
+                </c:if>
+                <c:if test="${!empty item.enable}">
+                    <c:if test="${item.enable == 'TRUE'}">
+                        <p class="menu_head">仓库管理</p>
+                        <div style="display:block" class="menu_body">
+                            <table style="order-collapse:collapse;border:0px solid ;margin-top:8px; margin-bottom:8px"
+                                   cellspacing="8">
+                                <tr>
+                                    <td id="_sys_wms"
+                                        onmouseout="javascript:this.style.background='#ffffff';this.style.color='#666666'"
+                                        ;
+                                        onmousemove="javascript:this.style.background='#31baee';this.style.color='ffffff'"
+                                        ; onclick="getColumnDetail(this,this.id,this.value)" align="center">WMS
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </c:if>
+                </c:if>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="s_login_center_bottom"></div>
+</div>
+</body>
+</html>
